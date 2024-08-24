@@ -1,4 +1,5 @@
 using UnityEngine;
+using UnityEngine.UI;
 
 [RequireComponent(typeof(TrajectoryPredictor))]
 public class ProjectileThrow : MonoBehaviour
@@ -7,16 +8,17 @@ public class ProjectileThrow : MonoBehaviour
     [Header("Physics")]
     [SerializeField, Range(40f, 50f)] private float maxForce;
     [SerializeField, Range(5f, 15f)] private float minForce;
-    [SerializeField, Range(15f, 40f)] private float startingForce;
     private float force;
 
     [Header("Shooting")]
     [SerializeField] private float fireRate;
+    [SerializeField] private float projectileLifeSpan;
     private float nextTimeToFire;
 
     [Header("References")]
     [SerializeField] private Transform spawnPoint;
     [SerializeField] private Rigidbody objectToThrow;
+    [SerializeField] private Slider forceSlider;
     private TrajectoryPredictor trajectoryPredictor;
     #endregion
 
@@ -30,7 +32,8 @@ public class ProjectileThrow : MonoBehaviour
 
     private void Start()
     {
-        force = startingForce;
+        SetSliderValues();
+        AdjustForce();
         nextTimeToFire = Time.time;
     }
 
@@ -38,16 +41,19 @@ public class ProjectileThrow : MonoBehaviour
     {
         Predict();
         AdjustForce();
-
-        if (Input.GetMouseButton(0) && Time.timeScale != 0f)
-        {
-            ThrowObject();
-        }
     }
 
-    private void AdjustForce()
+    public void AdjustForce()
     {
-        force = Mathf.Clamp(force += Input.mouseScrollDelta.y, minForce, maxForce);
+        force = forceSlider.value;
+    }
+    
+    private void SetSliderValues()
+    {
+        forceSlider.minValue = minForce;
+        forceSlider.maxValue = maxForce;
+
+        forceSlider.value = minForce + ((maxForce - minForce) / 2f);
     }
 
     private void Predict()
@@ -69,7 +75,7 @@ public class ProjectileThrow : MonoBehaviour
         return properties;
     }
 
-    private void ThrowObject()
+    public void ThrowObject()
     {
         if (nextTimeToFire >= Time.time) return;
 
@@ -77,5 +83,7 @@ public class ProjectileThrow : MonoBehaviour
 
         Rigidbody thrownObject = Instantiate(objectToThrow, spawnPoint.position, spawnPoint.rotation);
         thrownObject.AddForce(spawnPoint.forward * force, ForceMode.Impulse);
+
+        Destroy(thrownObject.gameObject, projectileLifeSpan);
     }
 }
