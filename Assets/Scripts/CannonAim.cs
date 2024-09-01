@@ -11,8 +11,14 @@ public class CannonAim : MonoBehaviour
     private bool rotatingLeft;
     private bool rotatingRight;
 
+    [SerializeField] private float maxRandomRotation;
+    private ProjectileThrow projectileThrow;
+
+    public float YAngle { get; private set; }
+
     private void Start()
     {
+        projectileThrow = GetComponent<ProjectileThrow>();
         SetSliderValues();
     }
 
@@ -48,6 +54,7 @@ public class CannonAim : MonoBehaviour
     public void TiltCannon()
     {
         objectToTilt.localEulerAngles = new Vector3(-angleSlider.value, 0f, 0f);
+        YAngle = objectToTilt.eulerAngles.x;
     }
 
     private void SetSliderValues()
@@ -56,5 +63,16 @@ public class CannonAim : MonoBehaviour
         angleSlider.maxValue = maxTilt;
 
         angleSlider.value = minTilt + ((maxTilt - minTilt) / 2f);
+    }
+
+    public void SetRandomValues()
+    {
+        transform.eulerAngles = new(transform.eulerAngles.x, Random.Range(-maxRandomRotation, maxRandomRotation), transform.eulerAngles.z);
+
+        float newTilt = Random.Range(minTilt, maxTilt);
+        objectToTilt.localEulerAngles = new Vector3(-newTilt, 0f, 0f);
+        angleSlider.value = newTilt;
+
+        projectileThrow.RandomForce();
     }
 }

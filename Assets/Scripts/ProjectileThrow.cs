@@ -17,9 +17,13 @@ public class ProjectileThrow : MonoBehaviour
 
     [Header("References")]
     [SerializeField] private Transform spawnPoint;
+    [SerializeField] private Transform hitMarker;
     [SerializeField] private Rigidbody objectToThrow;
     [SerializeField] private Slider forceSlider;
     private TrajectoryPredictor trajectoryPredictor;
+
+    public float Force { get => force; set => force = value; }
+    public float DistanceToHit { get; private set; }
     #endregion
 
     void OnEnable()
@@ -41,6 +45,7 @@ public class ProjectileThrow : MonoBehaviour
     {
         Predict();
         AdjustForce();
+        MeasureDistanceToHit();
     }
 
     public void AdjustForce()
@@ -85,5 +90,17 @@ public class ProjectileThrow : MonoBehaviour
         thrownObject.AddForce(spawnPoint.forward * force, ForceMode.Impulse);
 
         Destroy(thrownObject.gameObject, projectileLifeSpan);
+    }
+
+    private void MeasureDistanceToHit()
+    {
+        DistanceToHit = Vector3.Distance(transform.position, hitMarker.position);
+    }
+
+    public void RandomForce()
+    {
+        float newForce = Random.Range(minForce, maxForce);
+        force = newForce;
+        forceSlider.value = force;
     }
 }

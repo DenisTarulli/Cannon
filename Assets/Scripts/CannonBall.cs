@@ -1,18 +1,31 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
 public class CannonBall : MonoBehaviour
 {
-    // Start is called before the first frame update
-    void Start()
+    private StatsUI statsUI;
+
+    private void Start()
     {
-        
+        statsUI = FindObjectOfType<StatsUI>();
     }
 
-    // Update is called once per frame
-    void Update()
+    private void OnCollisionEnter(Collision collision)
     {
-        
+        if (!collision.gameObject.CompareTag("Target")) return;
+
+        Vector3 collisionForce = collision.impulse / Time.fixedDeltaTime;
+
+        float xForce = Mathf.Abs(collisionForce.x);
+        float yForce = Mathf.Abs(collisionForce.y);
+        float zForce = Mathf.Abs(collisionForce.z);
+
+        if (xForce > yForce && xForce > yForce)
+            statsUI.SetImpactForceUI(xForce);
+        else if (yForce > zForce)
+            statsUI.SetImpactForceUI(yForce);
+        else
+            statsUI.SetImpactForceUI(zForce);
+
+        this.enabled = false;
     }
 }
