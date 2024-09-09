@@ -1,5 +1,3 @@
-using System.Collections;
-using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
 
@@ -12,6 +10,10 @@ public class StatsUI : MonoBehaviour
     [SerializeField] private TextMeshProUGUI distanceText;
     [SerializeField] private TextMeshProUGUI impactForceText;
 
+    [SerializeField] private LastShotInfo shotInfo;
+    private float lastXAngle;
+    private float lastYAngle;
+
     private ProjectileThrow projectileThrow;
     private CannonAim cannonAim;
 
@@ -19,6 +21,8 @@ public class StatsUI : MonoBehaviour
     {
         projectileThrow = FindObjectOfType<ProjectileThrow>();
         cannonAim = FindObjectOfType<CannonAim>();
+
+        shotInfo.ResetValues();
     }
 
     private void Update()
@@ -51,6 +55,7 @@ public class StatsUI : MonoBehaviour
         if (xAngleToDisplay > 180f)        
             xAngleToDisplay -= 360f;
         
+        lastXAngle = xAngleToDisplay;
         xAngleText.text = $"xAngle: {string.Format("{0:0.##}", xAngleToDisplay)}°";
 
         float yAngleToDisplay = cannonAim.YAngle;
@@ -60,6 +65,7 @@ public class StatsUI : MonoBehaviour
         else
             yAngleToDisplay = -yAngleToDisplay;
 
+        lastYAngle = yAngleToDisplay;
         yAngleText.text = $"yAngle: {string.Format("{0:0.##}", yAngleToDisplay)}°";
     }
 
@@ -71,5 +77,15 @@ public class StatsUI : MonoBehaviour
     public void SetImpactForceUI(float force)
     {
         impactForceText.text = $"Impact force: {string.Format("{0:0.##}", force)}";
+
+        SetLastShotInfo(force);
+    }
+
+    private void SetLastShotInfo(float lastImpactForce)
+    {
+        shotInfo.Force = projectileThrow.Force;
+        shotInfo.X_Angle = lastXAngle;
+        shotInfo.Y_Angle = lastYAngle;
+        shotInfo.ImpactForce = lastImpactForce;
     }
 }
