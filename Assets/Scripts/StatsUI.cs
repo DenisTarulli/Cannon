@@ -4,6 +4,8 @@ using UnityEngine;
 public class StatsUI : MonoBehaviour
 {
     [SerializeField] private GameObject statsPanel;
+    [SerializeField] private GameObject generalPanel;
+    [SerializeField] private GameObject shotListPanel;
     [SerializeField] private TextMeshProUGUI forceText;
     [SerializeField] private TextMeshProUGUI xAngleText;
     [SerializeField] private TextMeshProUGUI yAngleText;
@@ -16,6 +18,7 @@ public class StatsUI : MonoBehaviour
 
     private ProjectileThrow projectileThrow;
     private CannonAim cannonAim;
+    private bool listIsOpen;
 
     private void Start()
     {
@@ -30,6 +33,9 @@ public class StatsUI : MonoBehaviour
         if (Input.GetKeyDown(KeyCode.Tab))
             ToggleUI();
 
+        if (Input.GetKeyDown(KeyCode.Escape))
+            ToggleShotList();
+
         SetForceUI();
         SetAnglesUI();
         SetDistanceUI();
@@ -37,10 +43,28 @@ public class StatsUI : MonoBehaviour
 
     private void ToggleUI()
     {
+        if (listIsOpen) return;
+
         if (statsPanel.activeSelf)
             statsPanel.SetActive(false);
         else
             statsPanel.SetActive(true);
+    }
+
+    private void ToggleShotList()
+    {
+        if (!shotListPanel.activeSelf)
+        {
+            generalPanel.SetActive(false);
+            shotListPanel.SetActive(true);
+            listIsOpen = true;
+        }
+        else
+        {
+            generalPanel.SetActive(true);
+            shotListPanel.SetActive(false);
+            listIsOpen = false;
+        }
     }
 
     private void SetForceUI()
